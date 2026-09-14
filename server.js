@@ -148,6 +148,9 @@ app.get("/api/quote", async (req, res) => {
 app.get("/", (req, res) => {
   res.sendFile(path.join(process.cwd(), "public", "index.html"));
 });
+
+app.listen(port, () => console.log(`MUBEE AI running at http://localhost:${port}`));
+});
 });
 
 app.listen(port, () => console.log(`MUBEE AI running at http://localhost:${port}`));
