@@ -1,14 +1,9 @@
-<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html><html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>MUBEE AI Trading Analyzer</title>
-
-<style>
-*{
-  box-sizing:border-box;
-}
+<title>MUBEE AI Trading Analyzer</title><style>
+*{box-sizing:border-box}
 
 body{
   margin:0;
@@ -55,9 +50,7 @@ label{
   margin-bottom:10px;
 }
 
-input,
-select,
-textarea{
+input,select,textarea{
   width:100%;
   padding:13px;
   margin-bottom:15px;
@@ -115,178 +108,211 @@ button:disabled{
   padding:25px;
   font-size:13px;
 }
-</style>
-</head>
-
-<body>
-
-<div class="header">
+</style></head><body><div class="header">
   <h1>🟡 MUBEE AI</h1>
   <div class="subtitle">Gold Trading Analyzer</div>
-</div>
+</div><div class="container"><div class="card"><label>Chart Image</label>
+<input type="file" id="chart" accept="image/*">
 
-<div class="container">
+<label>Asset</label>
+<select id="asset">
 
-  <div class="card">
+<option value="XAUUSD" selected>XAUUSD / Gold</option>
+<option value="EURUSD">EURUSD</option>
+<option value="GBPUSD">GBPUSD</option>
+<option value="USDJPY">USDJPY</option>
+<option value="BTCUSD">BTCUSD</option>
+</select><label>Timeframe</label>
+<select id="timeframe">
 
-    <label>Chart Image</label>
-    <input type="file" id="chart" accept="image/*">
+<option value="1M">1M</option>
+<option value="5M">5M</option>
+<option value="15M" selected>15M</option>
+<option value="1H">1H</option>
+<option value="4H">4H</option>
+<option value="1D">1D</option>
+</select><label>Risk ($)</label>
+<input type="number" id="risk" value="2" min="0">
 
-    <label>Asset</label>
-    <input type="text" id="asset" value="XAUUSD">
+<label>Minimum Target (pips)</label>
+<input type="number" id="minPips" value="10" min="1">
 
-    <label>Timeframe</label>
-    <select id="timeframe">
-      <option value="1M">1M</option>
-      <option value="5M">5M</option>
-      <option value="15M" selected>15M</option>
-      <option value="1H">1H</option>
-      <option value="4H">4H</option>
-      <option value="1D">1D</option>
-    </select>
+<label>Question</label>
 
-    <label>Risk ($)</label>
-    <input type="number" id="risk" value="2" min="0">
-
-    <label>Minimum Target (pips)</label>
-    <input type="number" id="minPips" value="10" min="1">
-
-    <label>Question</label>
-    <textarea
-      id="question"
-      placeholder="Example: XAUUSD buy hai ya sell? Entry, SL aur TP batao."
-    ></textarea>
-
-    <button id="analyzeBtn" onclick="analyzeChart()">
-      🔍 ANALYZE CHART
-    </button>
-
-    <div id="status"></div>
-
-  </div>
-
-  <div class="card">
-
-    <div class="result-title">
-      📊 MUBEE AI Analysis
-    </div>
-
-    <div id="result">
-      Chart upload karke ANALYZE CHART press karein.
-    </div>
-
-  </div>
-
-</div>
-
-<div class="footer">
-  MUBEE AI Trading Analyzer
-</div>
-
-<script>
+<textarea id="question"
+placeholder="Example: XAUUSD buy hai ya sell? Entry, SL aur TP batao."></textarea><button id="analyzeBtn" onclick="analyzeChart()">
+🔍 ANALYZE CHART
+</button><div id="status"></div></div><div class="card"><div class="result-title">
+📊 MUBEE AI Analysis
+</div><div id="result">
+Chart upload karke ANALYZE CHART press karein.
+</div></div></div><div class="footer">
+MUBEE AI Trading Analyzer
+</div><script>
 
 async function analyzeChart(){
 
-  const chart = document.getElementById("chart");
-  const asset = document.getElementById("asset").value;
-  const timeframe = document.getElementById("timeframe").value;
-  const risk = document.getElementById("risk").value;
-  const minPips = document.getElementById("minPips").value;
-  const question = document.getElementById("question").value;
+const chart=document.getElementById("chart");
+const asset=document.getElementById("asset").value;
+const timeframe=document.getElementById("timeframe").value;
+const risk=document.getElementById("risk").value;
+const minPips=document.getElementById("minPips").value;
+const question=document.getElementById("question").value;
 
-  const button = document.getElementById("analyzeBtn");
-  const status = document.getElementById("status");
-  const result = document.getElementById("result");
+const button=document.getElementById("analyzeBtn");
+const status=document.getElementById("status");
+const result=document.getElementById("result");
 
-  if(!chart.files.length){
-    alert("Pehle chart image upload karein.");
-    return;
-  }
+if(!chart.files.length){
+alert("Pehle chart image upload karein.");
+return;
+}
 
-  button.disabled = true;
+button.disabled=true;
+status.innerText="⏳ MUBEE AI chart analyze kar raha hai...";
+result.innerText="";
 
-  status.innerText =
-    "⏳ MUBEE AI chart analyze kar raha hai...";
+try{
 
-  result.innerText = "";
+const formData=new FormData();
 
-  try{
+formData.append("chart",chart.files[0]);
+formData.append("asset",asset);
+formData.append("timeframe",timeframe);
+formData.append("risk",risk);
+formData.append("minPips",minPips);
 
-    const formData = new FormData();
+formData.append(
+"question",
+question ||
+"XAUUSD ka complete technical analysis karo. BUY, SELL ya WAIT batao. Entry, Stop Loss, TP1 se TP5, BOS, CHOCH, liquidity sweep, support/resistance, FVG, order block aur breaker block check karo."
+);
 
-    formData.append(
-      "chart",
-      chart.files[0]
-    );
+const response=await fetch("/api/analyze",{
+method:"POST",
+body:formData
+});
 
-    formData.append(
-      "asset",
-      asset
-    );
+const text=await response.text();
 
-    formData.append(
-      "timeframe",
-      timeframe
-    );
+let data;
 
-    formData.append(
-      "risk",
-      risk
-    );
+try{
+data=JSON.parse(text);
+}catch{
+throw new Error(
+"Server ne valid JSON response nahi diya: "+text.slice(0,300)
+);
+}
 
-    formData.append(
-      "minPips",
-      minPips
-    );
+if(!response.ok){
+throw new Error(data.error || "Analysis failed");
+}
 
-    formData.append(
-      "question",
-      question ||
-      "XAUUSD ka complete technical analysis karo. BUY, SELL ya WAIT batao. Entry, Stop Loss, Take Profit aur important support/resistance batao."
-    );
+result.innerText=formatAnalysis(data);
 
-    const response = await fetch(
-      "/api/analyze",
-      {
-        method:"POST",
-        body:formData
-      }
-    );
+status.innerText="✅ Analysis complete";
 
-    const data = await response.json();
+}catch(error){
 
-    if(!response.ok){
-      throw new Error(
-        data.error || "Analysis failed"
-      );
-    }
+console.error(error);
 
-    result.innerText =
-      JSON.stringify(data,null,2);
+status.innerText="❌ Error";
 
-    status.innerText =
-      "✅ Analysis complete";
+result.innerText=
+"Analysis nahi ho saki.\n\n"+
+error.message;
 
-  }catch(error){
+}finally{
 
-    console.error(error);
-
-    status.innerText =
-      "❌ Error";
-
-    result.innerText =
-      "Analysis nahi ho saki.\n\n" +
-      error.message;
-
-  }finally{
-
-    button.disabled = false;
-
-  }
+button.disabled=false;
 
 }
 
-</script>
+}
 
-</body>
-        </html>
+function formatAnalysis(data){
+
+let output="";
+
+output+="SIGNAL: "+(data.signal || "WAIT")+"\n";
+output+="CONFIDENCE: "+(data.confidence ?? "N/A")+"%\n";
+output+="ASSET: "+(data.asset || "N/A")+"\n";
+output+="TIMEFRAME: "+(data.timeframe || "N/A")+"\n";
+output+="CURRENT PRICE: "+(data.currentPrice ?? "N/A")+"\n\n";
+
+output+="ENTRY\n";
+
+if(data.entry){
+output+="Low: "+(data.entry.low ?? "N/A")+"\n";
+output+="High: "+(data.entry.high ?? "N/A")+"\n";
+}
+
+output+="\nSTOP LOSS: "+(data.stopLoss ?? "N/A")+"\n";
+
+output+="\nTARGETS\n";
+
+if(Array.isArray(data.targets)){
+data.targets.forEach((target,index)=>{
+output+="TP"+(index+1)+": "+(target ?? "N/A")+"\n";
+});
+}
+
+output+="\nRISK / REWARD: "+(data.riskReward ?? "N/A")+"\n";
+output+="MARKET BIAS: "+(data.marketBias || "N/A")+"\n";
+
+output+="\nSTRUCTURE\n";
+
+if(data.structure){
+output+="BOS: "+JSON.stringify(data.structure.bos || [])+"\n";
+output+="CHOCH: "+JSON.stringify(data.structure.choch || [])+"\n";
+output+="Trend: "+(data.structure.trend || "N/A")+"\n";
+}
+
+output+="\nLIQUIDITY\n";
+
+if(data.liquidity){
+output+="Buy Side: "+JSON.stringify(data.liquidity.buySide || [])+"\n";
+output+="Sell Side: "+JSON.stringify(data.liquidity.sellSide || [])+"\n";
+output+="Sweeps: "+JSON.stringify(data.liquidity.sweeps || [])+"\n";
+}
+
+output+="\nZONES\n";
+
+if(data.zones){
+output+="Support: "+JSON.stringify(data.zones.support || [])+"\n";
+output+="Resistance: "+JSON.stringify(data.zones.resistance || [])+"\n";
+output+="Supply: "+JSON.stringify(data.zones.supply || [])+"\n";
+output+="Demand: "+JSON.stringify(data.zones.demand || [])+"\n";
+output+="FVG: "+JSON.stringify(data.zones.fvg || [])+"\n";
+output+="Order Blocks: "+JSON.stringify(data.zones.orderBlocks || [])+"\n";
+output+="Breaker Blocks: "+JSON.stringify(data.zones.breakerBlocks || [])+"\n";
+}
+
+output+="\nBREAKOUT\n";
+
+if(data.breakout){
+output+="Status: "+(data.breakout.status || "None")+"\n";
+output+="Retest: "+(data.breakout.retest ? "Yes" : "No")+"\n";
+}
+
+output+="\nCONFIRMATIONS\n";
+output+=JSON.stringify(data.confirmations || [],null,2);
+
+output+="\n\nINVALIDATION\n";
+output+=(data.invalidation || "N/A");
+
+output+="\n\nEXPLANATION\n";
+output+=(data.explanation || "N/A");
+
+if(Array.isArray(data.noTradeReasons) && data.noTradeReasons.length){
+output+="\n\nNO TRADE REASONS\n";
+output+=JSON.stringify(data.noTradeReasons,null,2);
+}
+
+return output;
+
+}
+
+</script></body>
+</html>
