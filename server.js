@@ -320,8 +320,8 @@ process.cwd(),
 );
 });
 
+// Start server
 app.listen(port, "0.0.0.0", () => {
-console.log(`MUBEE AI running on port ${port}`);
-);
+  console.log(`MUBEE AI running on port ${port}`);
 });
   
